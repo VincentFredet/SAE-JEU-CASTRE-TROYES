@@ -110,38 +110,50 @@
     "title": "RELIQUES",
     "workingTitle": "working title",
     "tagline": "A hybrid game of hidden actions and deduction",
-    "meta": "4 to 5 players - around 30 min",
+    "meta": "4 to 6 players - 30 to 40 min",
     "pitchTitle": "The pitch",
-    "pitchBody": "A party of adventurers digs through an ancient site. Each player secretly receives a mission (steal a relic, forge it, map the site, double-cross a rival...). Everyone moves in plain sight on the board, but acts in secret from their phone: you see WHERE each player goes and THAT they act, never WHAT. First to complete their mission through to their public final act without being blocked wins.",
+    "pitchBody": "An expedition digs through an ancient site. Each player secretly receives a mission: steal, forge, decode, unmask... Everyone moves in plain sight on the board, but acts in secret from their phone: you see WHERE each player goes and THAT they act, never WHAT. First to carry their mission through to its public final act, without being blocked, wins.",
     "hybridTitle": "The hybrid core",
-    "hybridIntro": "Two media locked to each other: without the board, there is no public information to read, so no deduction; without the app, there is no secret and no resolution.",
+    "hybridIntro": "Two surfaces locked to each other: without the board, no public information to read, so no deduction; without the app, no secrecy and no resolution.",
     "tableLabel": "On the table - public",
     "appLabel": "In the app - secret",
     "tableItems": [
-      "Pawn positions and movements",
+      "Pawn positions and moves",
       "Relics and their location",
       "Action traces (token + sound)",
-      "Accusations made in front of all"
+      "Accusations laid out for all"
     ],
     "appItems": [
-      "Your mission and your progress",
+      "Your mission and its progress",
       "The content of each action",
-      "The info fragments you collect",
+      "The fragments and key clues gathered",
       "The true state of relics (real / fake / sabotaged)"
     ],
-    "mapTitle": "The map - 7 locations",
-    "mapIntro": "A star around a central hub, with shortcuts and an extraction point.",
-    "mapHub": "Central hub",
+    "mapTitle": "The map - 3 zones",
+    "mapIntro": "A site in three zones linked by bottlenecks: the Ruins (where the relics live), the Camp (base and objective locations), the Lands (extraction).",
+    "mapHub": "Hub",
     "mapExtract": "Extraction",
-    "mapNote": "Everything is 1-2 steps away: carrying a relic takes 2-3 turns, risky but never punishing. The shortcuts (Temple-Tomb, Jungle-Docks) keep anyone from reading routes perfectly.",
+    "mapNote": "Several objective locations spread the action out: Extract (Docks or Cliff), Validate or forge (Workshop), Publish (Sanctuary), Offload (Bazaar). Cutting a bottleneck (Bridge, Rift) forces detours and reshapes the map mid-game.",
+    "zones": {
+      "ruins": "The Ruins",
+      "camp": "The Camp",
+      "lands": "The Lands"
+    },
     "locations": {
       "temple": "Temple",
-      "tomb": "Tomb",
-      "sanctuary": "Sanctuary",
+      "tombeau": "Tomb",
+      "sanctuaire": "Sanctuary",
+      "crypte": "Crypt",
+      "galerie": "Gallery",
       "camp": "Camp",
-      "bazaar": "Bazaar",
+      "bazar": "Bazaar",
+      "atelier": "Workshop",
       "jungle": "Jungle",
-      "docks": "Docks"
+      "marais": "Marsh",
+      "docks": "Docks",
+      "falaise": "Cliff",
+      "pont": "Bridge",
+      "faille": "Rift"
     },
     "actionsTitle": "The 5 actions",
     "actionsIntro": "One action per turn. Golden rule: you never act invisibly, only ambiguously. The secret is in the WHAT, never in the IF.",
@@ -149,33 +161,105 @@
     "colPublic": "Public",
     "colTrace": "Trace left",
     "actions": [
-      { "name": "Move", "public": "The pawn moves", "trace": "None" },
-      { "name": "Investigate", "public": "An action took place", "trace": "Token + sound (silent option)" },
-      { "name": "Take / Drop a relic", "public": "An action + the relic moves (visible)", "trace": "Token + sound" },
-      { "name": "Sabotage (forge, trap)", "public": "An action took place", "trace": "Token + sound" },
-      { "name": "Accuse a player", "public": "Fully public", "trace": "-" }
+      {
+        "name": "Move",
+        "public": "The pawn moves",
+        "trace": "None"
+      },
+      {
+        "name": "Investigate",
+        "public": "An action took place",
+        "trace": "Token + sound (silent option)"
+      },
+      {
+        "name": "Take / Drop a relic",
+        "public": "An action + the relic changes place",
+        "trace": "Token + sound"
+      },
+      {
+        "name": "Sabotage",
+        "public": "An action took place",
+        "trace": "Token + sound"
+      },
+      {
+        "name": "Accuse a player",
+        "public": "Fully public",
+        "trace": "-"
+      }
     ],
-    "constraintsNote": "Inventory: 1 relic carried at most. Theft and sabotage: only if you are in the same location as the target.",
+    "constraintsNote": "Inventory: 1 relic max. Theft and sabotage: only if you are in the same location as the target. Acting in silence avoids the Guardian but has a cost.",
     "missionsTitle": "The missions",
-    "missionsBody": "3 steps of balanced length (the app balances them), anchored in precise locations: your movement pattern IS the clue. The app makes several missions converge on the same relics but with different verbs: you will get in each other's way. The last step is always public and interceptable.",
-    "missionsExamplesTitle": "Mission examples",
+    "missionsBody": "A mission is not a ready-made recipe: its final act stays LOCKED until you have found a key clue. Often several relics look alike (real or fake): you must DISCOVER which one is the right one before acting, or your act lands on a fake and fails. You investigate to identify your target, then you act - and the others run the same investigation, in conflict. Shape: investigate -> target identified -> verb -> final location, plus a constraint (without being seen at the Temple, before round 8, with a fake...).",
+    "missionsExamplesTitle": "Example missions",
     "missions": [
-      { "name": "The Thief", "steps": "Take the Idol (Temple) -> bring it to the Docks -> extract it." },
-      { "name": "The Forger", "steps": "Reach the Idol -> sabotage it (a fake) -> have it validated at the Camp." },
-      { "name": "The Rival", "steps": "Get the Idol for yourself -> extract it before the others." },
-      { "name": "The Cartographer", "steps": "Investigate at the Temple, the Tomb and the Sanctuary -> publish at the Sanctuary. Silent mission: move no relic." }
+      {
+        "name": "The Thief",
+        "steps": "Three Idols on the site, only one real. Find which one (the Expert or by investigating) -> bring it to the Docks -> extract."
+      },
+      {
+        "name": "The Forger",
+        "steps": "Forge the real relic (create a fake) -> have YOUR fake validated at the Workshop by the Expert."
+      },
+      {
+        "name": "The Decoder",
+        "steps": "Gather three scattered fragments (Temple, Crypt, Gallery) that form a code -> open the vault -> publish at the Sanctuary."
+      },
+      {
+        "name": "The Sleuth",
+        "steps": "Discover a rival's mission target (via the Witness or the Guardian) -> block them right at their final act."
+      }
+    ],
+    "npcsTitle": "The characters",
+    "npcsIntro": "Neutral characters populate the site; some of them move.",
+    "npcs": [
+      {
+        "name": "The Guardian",
+        "text": "Patrols toward the LOUDEST action. If it reaches you after a noisy action, you risk being exposed (a fragment of your mission revealed) or dropping your relic. Silence avoids it, but it costs."
+      },
+      {
+        "name": "The Expert",
+        "text": "Tells the real from the fake. Bring a relic to validate it... or to pass your fake off as real."
+      },
+      {
+        "name": "The Smuggler",
+        "text": "At the Bazaar and the Docks: trade a relic, buy an info fragment, bribe."
+      },
+      {
+        "name": "The Witness",
+        "text": "It is through them that you investigate a player: one attribute of their mission."
+      }
+    ],
+    "sabotageTitle": "Sabotage through the map",
+    "sabotageIntro": "Sabotage is spatial: you must be on site, and it acts on the geography.",
+    "sabotages": [
+      {
+        "name": "Trap a location",
+        "text": "The next one to act here springs the trap: loses a turn, drops their relic or leaks a fragment."
+      },
+      {
+        "name": "Collapse a passage",
+        "text": "Cut a shortcut or a bottleneck (Bridge, Rift) for a few turns: forced detours, reshaped map."
+      },
+      {
+        "name": "Forge on the spot",
+        "text": "Swap the relic for a fake: same public token, hidden state fake. Extracting it fails."
+      },
+      {
+        "name": "Plant a false trace",
+        "text": "Lay a fake action token to mislead the others' deduction."
+      }
     ],
     "turnTitle": "The game turn",
-    "turnBody": "Turn by turn, order rotating each round. On your turn: 1) you pick 1 action on your phone; 2) the app resolves it and fires the public effect (the pawn moves, OR a trace token + sound drops, OR a relic changes hands, OR an announcement); 3) the players update the board.",
+    "turnBody": "Turn by turn, rotating order. On your turn: 1) you choose 1 action on your phone; 2) the app resolves it and triggers the public effect (pawn moving, trace token + sound, relic changing hands, or announcement); 3) players update the board.",
     "climaxTitle": "The final extraction",
-    "climaxBody": "At the right place with what you need, you declare your final act (Extract at the Docks, Validate at the Camp, Publish at the Sanctuary). The app announces it to all, but it only resolves at the START of your next turn: each opponent has exactly one turn to react (come steal the relic off your tile, sabotage you, or accuse you). Survive until your turn: you win.",
+    "climaxBody": "Once your target is identified and you are at the right location, you declare your final act (Extract, Validate, Publish, Offload). The app announces it to all, but it only resolves at the START of your next turn: each opponent has exactly one turn to react (steal the relic, sabotage you, accuse you). Survive until your turn: you win.",
     "infoTitle": "Investigate",
-    "infoBody": "An investigate action yields a single private fragment: on a trace -> the TYPE of the last action here (not who did it); on a player (witness present) -> ONE attribute of their mission (their target OR their type, not both).",
+    "infoBody": "The crux of it all, since missions run on locked information. One investigation = a single private fragment: on a trace -> the TYPE of the last action here; on a player (via the Witness) -> one attribute of their mission; on a relic (via the Expert) -> real or fake.",
     "accuseTitle": "Accuse",
-    "accuseBody": "Public action: you place your token and declare the target you believe to be theirs. Right -> they must drop the relic they carry (on their tile) and their intent is exposed. Wrong -> you reveal a fragment of YOUR own mission. Real risk.",
-    "endTitle": "End of the game",
-    "endBody": "First final act resolved without being blocked = win. Tempo safeguard: if nobody has won after around 12 rounds, the most advanced player wins (ties broken by correct accusations). A game: 8 to 12 rounds, around 30 min. Short race: a harassed player is never trapped, and every theft/sabotage costs the aggressor a turn.",
-    "ctaPlay": "Play a match"
+    "accuseBody": "A public action: you lay your token and you declare the target you believe is theirs. Right -> they drop the relic they carry and their intent is exposed. Wrong -> you reveal a fragment of YOUR mission. A real risk.",
+    "endTitle": "End of game",
+    "endBody": "First final act resolved without having been blocked = victory. Tempo safeguard: after about 12 to 14 rounds, the most advanced player wins (ties broken by correct accusations). At 4-6 players: 30 to 40 min.",
+    "ctaPlay": "Play a game"
   },
   "checkout": {
     "successTitle": "Thank you for your order!",

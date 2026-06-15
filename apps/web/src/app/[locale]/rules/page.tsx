@@ -10,17 +10,38 @@ type Props = { params: Promise<{ locale: string }> };
 
 type ActionRow = { name: string; public: string; trace: string };
 type Mission = { name: string; steps: string };
+type Npc = { name: string; text: string };
+type Sabotage = { name: string; text: string };
 type Locations = {
   temple: string;
-  tomb: string;
-  sanctuary: string;
+  tombeau: string;
+  sanctuaire: string;
+  crypte: string;
+  galerie: string;
   camp: string;
-  bazaar: string;
+  bazar: string;
+  atelier: string;
   jungle: string;
+  marais: string;
   docks: string;
+  falaise: string;
+  pont: string;
+  faille: string;
+};
+type Zones = {
+  ruins: string;
+  camp: string;
+  lands: string;
 };
 
 const MISSION_TONES = [
+  "bg-clay/10 text-clay",
+  "bg-pine/10 text-pine",
+  "bg-amber/15 text-clay-deep",
+  "bg-ink/10 text-ink",
+] as const;
+
+const SABOTAGE_TONES = [
   "bg-clay/10 text-clay",
   "bg-pine/10 text-pine",
   "bg-amber/15 text-clay-deep",
@@ -35,7 +56,10 @@ export default async function RulesPage({ params }: Props) {
   const appItems = t.raw("appItems") as string[];
   const actions = t.raw("actions") as ActionRow[];
   const missions = t.raw("missions") as Mission[];
+  const npcs = t.raw("npcs") as Npc[];
+  const sabotages = t.raw("sabotages") as Sabotage[];
   const locations = t.raw("locations") as Locations;
+  const zones = t.raw("zones") as Zones;
 
   return (
     <section className="relative overflow-hidden">
@@ -167,6 +191,7 @@ export default async function RulesPage({ params }: Props) {
                 <div className="relative mx-auto max-w-2xl">
                   <BoardMap
                     locations={locations}
+                    zones={zones}
                     hubLabel={t("mapHub")}
                     extractLabel={t("mapExtract")}
                   />
@@ -271,6 +296,94 @@ export default async function RulesPage({ params }: Props) {
                     </span>
                     <h3 className="mt-6 font-display text-2xl font-semibold text-ink">{m.name}</h3>
                     <p className="mt-3 leading-relaxed text-ink-soft">{m.steps}</p>
+                  </article>
+                </Tilt>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Les personnages */}
+        <div className="mt-24">
+          <Reveal>
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              {t("npcsTitle")}
+            </h2>
+          </Reveal>
+          <Reveal delay={80}>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{t("npcsIntro")}</p>
+          </Reveal>
+
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            {/* Le Gardien mis en avant */}
+            <Reveal dir="left" className="lg:row-span-2">
+              <Tilt className="h-full">
+                <article className="grain relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] bg-ink p-9 text-cream shadow-[0_30px_60px_-35px_rgba(33,26,19,0.6)]">
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-clay/40 blur-3xl animate-float"
+                  />
+                  <span className="relative grid h-12 w-12 place-items-center rounded-2xl bg-clay font-display text-lg font-semibold">
+                    1
+                  </span>
+                  <div className="relative mt-16">
+                    <h3 className="font-display text-3xl font-semibold leading-tight">
+                      {npcs[0]?.name}
+                    </h3>
+                    <p className="mt-3 leading-relaxed text-cream/75">{npcs[0]?.text}</p>
+                  </div>
+                </article>
+              </Tilt>
+            </Reveal>
+
+            {npcs.slice(1).map((npc, i) => (
+              <Reveal
+                key={npc.name}
+                dir="up"
+                delay={i * 90}
+                className="lg:col-span-2"
+              >
+                <Tilt>
+                  <article className="grain flex items-start gap-6 rounded-[2rem] border border-line bg-white/70 p-8 transition hover:border-clay/40 hover:shadow-[0_20px_50px_-25px_rgba(162,74,31,0.4)]">
+                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber/15 font-display text-xl font-semibold text-clay-deep">
+                      {i + 2}
+                    </span>
+                    <div>
+                      <h3 className="font-display text-2xl font-semibold text-ink">{npc.name}</h3>
+                      <p className="mt-2 leading-relaxed text-ink-soft">{npc.text}</p>
+                    </div>
+                  </article>
+                </Tilt>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Saboter par la carte */}
+        <div className="mt-24">
+          <Reveal dir="right">
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              {t("sabotageTitle")}
+            </h2>
+          </Reveal>
+          <Reveal dir="right" delay={80}>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
+              {t("sabotageIntro")}
+            </p>
+          </Reveal>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
+            {sabotages.map((s, i) => (
+              <Reveal key={s.name} dir={i % 2 === 0 ? "right" : "left"} delay={(i % 2) * 80}>
+                <Tilt className="h-full">
+                  <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-parchment/60 p-8 transition hover:border-clay/40 hover:shadow-[0_25px_55px_-30px_rgba(162,74,31,0.4)]">
+                    <span
+                      className={`grid h-12 w-12 place-items-center rounded-2xl font-display text-lg font-semibold ${SABOTAGE_TONES[i % SABOTAGE_TONES.length]}`}
+                    >
+                      {i + 1}
+                    </span>
+                    <h3 className="mt-6 font-display text-2xl font-semibold text-ink">{s.name}</h3>
+                    <p className="mt-3 leading-relaxed text-ink-soft">{s.text}</p>
                   </article>
                 </Tilt>
               </Reveal>
