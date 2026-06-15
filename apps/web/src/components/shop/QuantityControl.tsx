@@ -10,20 +10,25 @@ type Props = {
 };
 
 const stepButton =
-  "grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 text-sm font-semibold transition hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-900";
+  "grid h-9 w-9 place-items-center text-base font-semibold text-ink transition hover:bg-clay hover:text-cream disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink";
 
 export function QuantityControl({ itemId, quantity, max }: Props) {
   const t = useTranslations("shop");
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1.5" aria-label={t("quantity")}>
+    <div className="flex flex-wrap items-center gap-4">
+      <div
+        className="flex items-center overflow-hidden rounded-full border border-line bg-cream/60"
+        aria-label={t("quantity")}
+      >
         <form action={updateCartItem.bind(null, itemId, quantity - 1)}>
           <button type="submit" className={stepButton} aria-label="-">
             -
           </button>
         </form>
-        <span className="w-8 text-center text-sm font-semibold tabular-nums">{quantity}</span>
+        <span className="w-8 text-center text-sm font-semibold tabular-nums text-ink">
+          {quantity}
+        </span>
         <form action={updateCartItem.bind(null, itemId, quantity + 1)}>
           <button type="submit" className={stepButton} disabled={quantity >= max} aria-label="+">
             +
@@ -33,7 +38,7 @@ export function QuantityControl({ itemId, quantity, max }: Props) {
       <form action={removeCartItem.bind(null, itemId)}>
         <button
           type="submit"
-          className="text-sm font-medium text-zinc-500 underline-offset-4 transition hover:text-zinc-900 hover:underline dark:hover:text-white"
+          className="text-sm font-medium text-ink-soft underline-offset-4 transition hover:text-clay hover:underline"
         >
           {t("remove")}
         </button>

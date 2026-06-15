@@ -15,6 +15,9 @@ export async function Navbar() {
     { href: "/rules", label: t("rules") },
     { href: "/play", label: t("play") },
   ];
+  if (session?.user?.role === "ADMIN") {
+    links.push({ href: "/admin", label: t("admin") });
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/70 bg-cream/80 backdrop-blur-md">

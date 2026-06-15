@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
+type Direction = "up" | "down" | "left" | "right" | "scale";
+
 export function Reveal({
   children,
   delay = 0,
+  dir = "up",
   className,
 }: {
   children: ReactNode;
   delay?: number;
+  dir?: Direction;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,6 +38,7 @@ export function Reveal({
     <div
       ref={ref}
       data-reveal
+      data-dir={dir}
       data-show={show}
       className={className}
       style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}

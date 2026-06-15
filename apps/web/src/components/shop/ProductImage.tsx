@@ -9,11 +9,11 @@ type Props = {
 };
 
 const palette = [
-  "from-rose-200 to-orange-200 dark:from-rose-900 dark:to-orange-950",
-  "from-sky-200 to-indigo-200 dark:from-sky-900 dark:to-indigo-950",
-  "from-emerald-200 to-teal-200 dark:from-emerald-900 dark:to-teal-950",
-  "from-violet-200 to-fuchsia-200 dark:from-violet-900 dark:to-fuchsia-950",
-  "from-amber-200 to-lime-200 dark:from-amber-900 dark:to-lime-950",
+  "from-clay/30 via-amber/20 to-parchment",
+  "from-amber/30 via-clay/15 to-cream",
+  "from-pine/25 via-amber/15 to-parchment",
+  "from-clay-deep/25 via-clay/15 to-sand",
+  "from-sand via-amber/20 to-parchment",
 ];
 
 function pick(seed: string) {
@@ -25,7 +25,7 @@ function pick(seed: string) {
 }
 
 // Seeded products point to SVGs that may not exist yet. We always paint a
-// deterministic colored placeholder with the product initials, and reveal the
+// deterministic warm placeholder with the product initials, and reveal the
 // real image only once it has loaded so a missing file never breaks the layout.
 export function ProductImage({ src, alt, seed }: Props) {
   const [loaded, setLoaded] = useState(false);
@@ -38,9 +38,17 @@ export function ProductImage({ src, alt, seed }: Props) {
 
   return (
     <div
-      className={`relative grid aspect-[4/3] place-items-center overflow-hidden bg-gradient-to-br ${pick(seed)}`}
+      className={`relative grid h-full w-full place-items-center overflow-hidden bg-gradient-to-br ${pick(seed)}`}
     >
-      <span className="text-3xl font-black tracking-tight text-zinc-700/70 dark:text-zinc-100/70">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-cream/40 blur-2xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-8 -left-4 h-20 w-20 rounded-full bg-clay/20 blur-2xl"
+      />
+      <span className="font-display text-4xl font-semibold tracking-tight text-ink/30">
         {initials || "?"}
       </span>
       {src ? (
@@ -50,7 +58,7 @@ export function ProductImage({ src, alt, seed }: Props) {
           alt={alt}
           loading="lazy"
           onLoad={() => setLoaded(true)}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
             loaded ? "opacity-100" : "opacity-0"
           }`}
         />

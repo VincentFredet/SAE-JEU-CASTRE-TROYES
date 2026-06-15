@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { initLocale } from "@/lib/locale";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { AuthShell } from "@/components/auth/AuthShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -11,10 +12,16 @@ export default async function LoginPage({ params }: Props) {
   if (await auth()) redirect("/");
 
   const t = await getTranslations("auth");
+  const tc = await getTranslations("common");
+
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-16">
-      <h1 className="text-2xl font-bold tracking-tight">{t("loginTitle")}</h1>
+    <AuthShell
+      aside="left"
+      appName={tc("appName")}
+      tagline={tc("tagline")}
+      title={t("loginTitle")}
+    >
       <LoginForm />
-    </div>
+    </AuthShell>
   );
 }
