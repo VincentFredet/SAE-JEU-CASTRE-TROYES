@@ -8,6 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "bootstrap": "node scripts/setup-env.mjs && pnpm db:generate && pnpm db:deploy && pnpm db:seed",
     "dev": "pnpm --filter web dev",
     "dev:rt": "pnpm --filter realtime dev",
     "build": "pnpm -r build",
@@ -20,6 +21,7 @@
     "format:check": "prettier --check .",
     "db:generate": "pnpm --filter @jeux/db generate",
     "db:migrate": "pnpm --filter @jeux/db migrate",
+    "db:deploy": "pnpm --filter @jeux/db run migrate:deploy",
     "db:seed": "pnpm --filter @jeux/db seed",
     "db:studio": "pnpm --filter @jeux/db studio",
     "db:reset": "pnpm --filter @jeux/db reset"

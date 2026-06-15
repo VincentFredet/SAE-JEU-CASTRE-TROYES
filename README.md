@@ -26,34 +26,41 @@ packages/
 
 ## Prérequis
 
-- Node ≥ 20 (voir `.nvmrc`)
-- pnpm 10
-- PostgreSQL 15 en local
+- Node ≥ 20 (voir `.nvmrc`) — `corepack enable` active pnpm
+- Docker (recommandé, pour PostgreSQL) — ou un PostgreSQL 15 local
 
-## Installation
+## Démarrage rapide
 
 ```bash
 pnpm install
-cp .env.example .env            # adapter si besoin
+docker compose up -d   # lance PostgreSQL (attends ~5 s qu'il démarre)
+pnpm bootstrap             # crée les .env, applique le schéma, ajoute les données de démo
+pnpm dev               # site → http://localhost:3000
 ```
 
-Créer la base et appliquer le schéma :
+`pnpm bootstrap` est idempotent : il ne réécrit pas un `.env` déjà présent. Pour le jeu
+en ligne, lance le serveur temps réel dans un second terminal :
 
 ```bash
-# une base "jeux" avec un rôle "jeux" (droit CREATEDB pour les migrations)
-createdb jeux
-pnpm db:migrate
-pnpm db:seed
+pnpm dev:rt            # serveur de jeu → http://localhost:4000
 ```
 
-Les variables d'environnement sont attendues dans `apps/web/.env.local`, `packages/db/.env` et `apps/realtime/.env` (gabarit : `.env.example`).
+### Sans Docker
 
-## Lancer
+Si tu as déjà PostgreSQL, crée le rôle et la base attendus, puis lance `pnpm bootstrap` :
 
-```bash
-pnpm dev        # site web        → http://localhost:3000
-pnpm dev:rt     # serveur de jeu  → http://localhost:4000
+```sql
+CREATE ROLE jeux LOGIN PASSWORD 'jeux_dev_pwd';
+CREATE DATABASE jeux OWNER jeux;
 ```
+
+Sinon, adapte `DATABASE_URL` dans les fichiers `.env` créés par `pnpm bootstrap`.
+
+### En cas de souci
+
+- `pnpm bootstrap` échoue sur la connexion ? PostgreSQL n'est pas encore prêt : attends
+  quelques secondes puis relance `pnpm bootstrap`.
+- Repartir d'une base propre : `pnpm db:reset` (réapplique le schéma + seed).
 
 ## Comptes de démo
 
@@ -82,18 +89,20 @@ passe en `PAID` (stock décrémenté, panier vidé) via le webhook.
 
 ## Scripts
 
-| Commande           | Effet                              |
-| ------------------ | ---------------------------------- |
-| `pnpm dev`         | Site web (Next.js)                 |
-| `pnpm dev:rt`      | Service temps réel (Socket.IO)     |
-| `pnpm build`       | Build de production                |
-| `pnpm lint`        | ESLint                             |
-| `pnpm typecheck`   | Vérification des types             |
-| `pnpm test`        | Tests unitaires (Vitest)           |
-| `pnpm test:e2e`    | Tests end-to-end (Playwright)      |
-| `pnpm db:migrate`  | Migrations Prisma                  |
-| `pnpm db:seed`     | Données de démo                    |
-| `pnpm db:studio`   | Prisma Studio                      |
+| Commande           | Effet                                       |
+| ------------------ | ------------------------------------------- |
+| `pnpm bootstrap`       | `.env` + schéma + données de démo (1 commande) |
+| `pnpm dev`         | Site web (Next.js)                          |
+| `pnpm dev:rt`      | Service temps réel (Socket.IO)              |
+| `pnpm build`       | Build de production                         |
+| `pnpm lint`        | ESLint                                      |
+| `pnpm typecheck`   | Vérification des types                      |
+| `pnpm test`        | Tests unitaires (Vitest)                    |
+| `pnpm test:e2e`    | Tests end-to-end (Playwright)               |
+| `pnpm db:deploy`   | Applique les migrations (non-interactif)    |
+| `pnpm db:seed`     | Données de démo                             |
+| `pnpm db:studio`   | Prisma Studio                               |
+| `pnpm db:reset`    | Réinitialise la base (schéma + seed)        |
 
 ## État d'avancement
 
