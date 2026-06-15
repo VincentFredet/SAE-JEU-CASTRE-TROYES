@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@jeux/db";
 import { auth } from "@/lib/auth";
-import { checkout } from "@/lib/cart-actions";
+import { checkout } from "@/lib/checkout";
 import { formatPrice } from "@/lib/money";
 import { initLocale } from "@/lib/locale";
 import { ProductImage } from "@/components/shop/ProductImage";
