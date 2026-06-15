@@ -1,0 +1,42 @@
+{
+  "name": "sae-jeu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Site du jeu de société (SAÉ) — vitrine, e-commerce, jeu multijoueur en ligne",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:rt": "pnpm --filter realtime dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "pnpm --filter web test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @jeux/db generate",
+    "db:migrate": "pnpm --filter @jeux/db migrate",
+    "db:seed": "pnpm --filter @jeux/db seed",
+    "db:studio": "pnpm --filter @jeux/db studio",
+    "db:reset": "pnpm --filter @jeux/db reset"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild",
+      "@swc/core",
+      "sharp",
+      "@parcel/watcher",
+      "unrs-resolver"
+    ]
+  }
+}
