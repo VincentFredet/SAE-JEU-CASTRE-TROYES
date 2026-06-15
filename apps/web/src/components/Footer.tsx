@@ -16,10 +16,15 @@ export async function Footer() {
     <footer className="mt-24 border-t border-line bg-parchment/50">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-ink font-display text-xs font-semibold text-cream">
-            CT
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-ink font-display text-sm font-semibold text-cream">
+            R
           </span>
-          <span className="font-display text-base font-semibold text-ink">{t("appName")}</span>
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-base font-semibold text-ink">{t("appName")}</span>
+            <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-soft">
+              {t("studio")}
+            </span>
+          </span>
         </div>
 
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-soft">
@@ -33,7 +38,7 @@ export async function Footer() {
         </ul>
 
         <p className="text-sm text-ink-soft">
-          © {new Date().getFullYear()} {t("appName")}
+          © {new Date().getFullYear()} {t("appName")} {t("studio")}
         </p>
       </div>
     </footer>

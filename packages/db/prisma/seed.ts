@@ -11,12 +11,12 @@ const PRODUCTS = [
     imageUrl: "/products/jeu-base.svg",
     translations: {
       fr: {
-        name: "Le Jeu — Boîte de base",
-        description: "La boîte de base du jeu : plateau, cartes et règles complètes.",
+        name: "RELIQUES - Boite de base",
+        description: "La boite de base : plateau 7 lieux, pions, reliques, jetons et l'app compagnon. 4 a 5 joueurs.",
       },
       en: {
-        name: "The Game — Core Box",
-        description: "The core box: board, cards and the complete rulebook.",
+        name: "RELIQUES - Core Box",
+        description: "The core box: 7-location board, pawns, relics, tokens and the companion app. 4 to 5 players.",
       },
     },
   },
@@ -27,12 +27,12 @@ const PRODUCTS = [
     imageUrl: "/products/extension-1.svg",
     translations: {
       fr: {
-        name: "Extension n°1",
-        description: "Une extension qui ajoute de nouveaux modes et cartes.",
+        name: "RELIQUES - Le Temple Perdu",
+        description: "Une extension : nouveaux lieux, nouvelles reliques et missions inedites.",
       },
       en: {
-        name: "Expansion #1",
-        description: "An expansion adding new modes and cards.",
+        name: "RELIQUES - The Lost Temple",
+        description: "An expansion: new locations, new relics and fresh missions.",
       },
     },
   },
@@ -42,8 +42,14 @@ const PRODUCTS = [
     stock: 100,
     imageUrl: "/products/goodies.svg",
     translations: {
-      fr: { name: "Pack goodies", description: "Pions premium et sac de rangement." },
-      en: { name: "Goodies pack", description: "Premium tokens and a storage bag." },
+      fr: {
+        name: "RELIQUES - Pack collector",
+        description: "Pions premium, repliques de reliques et sac de rangement.",
+      },
+      en: {
+        name: "RELIQUES - Collector pack",
+        description: "Premium tokens, relic replicas and a storage bag.",
+      },
     },
   },
 ];
@@ -77,22 +83,19 @@ async function main() {
   });
 
   for (const p of PRODUCTS) {
-    await prisma.product.upsert({
+    const product = await prisma.product.upsert({
       where: { slug: p.slug },
       update: { priceCents: p.priceCents, stock: p.stock, imageUrl: p.imageUrl },
-      create: {
-        slug: p.slug,
-        priceCents: p.priceCents,
-        stock: p.stock,
-        imageUrl: p.imageUrl,
-        translations: {
-          create: [
-            { locale: "fr", ...p.translations.fr },
-            { locale: "en", ...p.translations.en },
-          ],
-        },
-      },
+      create: { slug: p.slug, priceCents: p.priceCents, stock: p.stock, imageUrl: p.imageUrl },
+      select: { id: true },
     });
+    for (const locale of ["fr", "en"] as const) {
+      await prisma.productTranslation.upsert({
+        where: { productId_locale: { productId: product.id, locale } },
+        update: p.translations[locale],
+        create: { productId: product.id, locale, ...p.translations[locale] },
+      });
+    }
   }
 
   await prisma.score.deleteMany({ where: { game: "default" } });

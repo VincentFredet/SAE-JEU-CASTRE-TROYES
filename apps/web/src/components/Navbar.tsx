@@ -23,11 +23,16 @@ export async function Navbar() {
     <header className="sticky top-0 z-50 border-b border-line/70 bg-cream/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="group flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink font-display text-sm font-semibold text-cream transition group-hover:bg-clay">
-            CT
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink font-display text-base font-semibold text-cream transition group-hover:bg-clay">
+            R
           </span>
-          <span className="font-display text-lg font-semibold tracking-tight text-ink">
-            {tc("appName")}
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink">
+              {tc("appName")}
+            </span>
+            <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-soft">
+              {tc("studio")}
+            </span>
           </span>
         </Link>
 
