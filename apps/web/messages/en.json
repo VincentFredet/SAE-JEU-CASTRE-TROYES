@@ -26,7 +26,17 @@
     "feature2Title": "Leaderboard",
     "feature2Text": "Earn points on every win and climb the global ranking.",
     "feature3Title": "Shop",
-    "feature3Text": "Order the core box, expansions and goodies."
+    "feature3Text": "Order the core box, expansions and goodies.",
+    "badge": "Board game · online",
+    "stepsTitle": "Three minutes to play",
+    "step1Title": "Create your account",
+    "step1Text": "Sign up in seconds, for free.",
+    "step2Title": "Start a match",
+    "step2Text": "Create a room and invite your friends, or join an open game.",
+    "step3Title": "Climb the leaderboard",
+    "step3Text": "Every win earns you points. Aim for the top.",
+    "finalTitle": "Ready to start a match?",
+    "finalText": "Create your account, invite your friends and climb the leaderboard."
   },
   "shop": {
     "title": "Shop",

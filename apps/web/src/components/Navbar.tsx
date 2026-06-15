@@ -10,7 +10,6 @@ export async function Navbar() {
   const session = await auth();
 
   const links = [
-    { href: "/", label: t("home") },
     { href: "/shop", label: t("shop") },
     { href: "/leaderboard", label: t("leaderboard") },
     { href: "/rules", label: t("rules") },
@@ -18,42 +17,50 @@ export async function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-zinc-900 text-sm font-black text-white dark:bg-white dark:text-zinc-900">
+    <header className="sticky top-0 z-50 border-b border-line/70 bg-cream/80 backdrop-blur-md">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="group flex items-center gap-2.5">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink font-display text-sm font-semibold text-cream transition group-hover:bg-clay">
             CT
           </span>
-          {tc("appName")}
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">
+            {tc("appName")}
+          </span>
         </Link>
 
-        <ul className="hidden items-center gap-6 text-sm font-medium text-zinc-600 sm:flex dark:text-zinc-300">
+        <ul className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex">
           {links.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="transition hover:text-zinc-900 dark:hover:text-white">
+              <Link
+                href={l.href}
+                className="relative transition after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-0 after:bg-clay after:transition-all after:duration-300 hover:text-ink hover:after:w-full"
+              >
                 {l.label}
               </Link>
             </li>
           ))}
         </ul>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/cart"
-            className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            className="hidden text-sm font-medium text-ink-soft transition hover:text-ink sm:block"
           >
             {t("cart")}
           </Link>
 
           {session?.user ? (
             <div className="flex items-center gap-2">
-              <Link href="/profile" className="text-sm font-semibold">
+              <Link
+                href="/profile"
+                className="text-sm font-semibold text-ink transition hover:text-clay"
+              >
                 {session.user.username}
               </Link>
               <form action={logoutAction}>
                 <button
                   type="submit"
-                  className="rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+                  className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-soft transition hover:border-clay hover:text-clay"
                 >
                   {t("logout")}
                 </button>
@@ -62,7 +69,7 @@ export async function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-cream transition hover:bg-clay"
             >
               {t("login")}
             </Link>

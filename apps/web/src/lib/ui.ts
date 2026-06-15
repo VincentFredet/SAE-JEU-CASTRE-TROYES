@@ -1,11 +1,11 @@
 export const card =
-  "rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950";
+  "rounded-2xl border border-line bg-white/70 p-6 shadow-[0_1px_2px_rgba(33,26,19,0.04)]";
 
 export const inputField =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-100";
+  "w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-soft/50 focus:border-clay focus:ring-2 focus:ring-clay/15";
 
 export const buttonPrimary =
-  "rounded-full bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition duration-200 hover:-translate-y-0.5 hover:bg-clay active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:bg-ink";
 
 export const buttonGhost =
-  "rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900";
+  "inline-flex items-center justify-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium text-ink transition hover:border-clay hover:text-clay disabled:opacity-50";

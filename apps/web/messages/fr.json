@@ -26,7 +26,17 @@
     "feature2Title": "Classement",
     "feature2Text": "Gagnez des points à chaque victoire et grimpez dans le classement mondial.",
     "feature3Title": "Boutique",
-    "feature3Text": "Commandez la boîte de base, les extensions et les goodies."
+    "feature3Text": "Commandez la boîte de base, les extensions et les goodies.",
+    "badge": "Jeu de société · en ligne",
+    "stepsTitle": "Trois minutes pour jouer",
+    "step1Title": "Crée ton compte",
+    "step1Text": "Inscription en quelques secondes, gratuite.",
+    "step2Title": "Lance une partie",
+    "step2Text": "Crée un salon et invite tes amis, ou rejoins une partie ouverte.",
+    "step3Title": "Grimpe au classement",
+    "step3Text": "Chaque victoire te rapporte des points. Vise le sommet.",
+    "finalTitle": "Prêt à lancer une partie ?",
+    "finalText": "Crée ton compte, invite tes amis et grimpe au classement."
   },
   "shop": {
     "title": "Boutique",
