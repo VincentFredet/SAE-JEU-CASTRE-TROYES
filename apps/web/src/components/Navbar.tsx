@@ -13,6 +13,7 @@ export async function Navbar() {
     { href: "/", label: t("home") },
     { href: "/shop", label: t("shop") },
     { href: "/leaderboard", label: t("leaderboard") },
+    { href: "/rules", label: t("rules") },
     { href: "/play", label: t("play") },
   ];
 
