@@ -71,4 +71,5 @@ jobs:
       - run: pnpm --filter @jeux/db run migrate:deploy
       - run: pnpm db:seed
       - run: pnpm --filter web exec playwright install --with-deps chromium
+      - run: pnpm build
       - run: pnpm --filter web test:e2e
