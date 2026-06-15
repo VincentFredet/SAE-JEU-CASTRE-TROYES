@@ -62,6 +62,24 @@ pnpm dev:rt     # serveur de jeu  → http://localhost:4000
 | Admin | admin@jeux.test    | admin1234    |
 | Joueur| joueur@jeux.test   | joueur1234   |
 
+## Paiement (Stripe)
+
+Le paiement est **optionnel**. Sans clés Stripe, le checkout valide directement la
+commande (mode démo). Avec des clés de test, il redirige vers Stripe Checkout :
+
+```bash
+# dans apps/web/.env.local
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."   # donné par la commande ci-dessous
+```
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+Carte de test : `4242 4242 4242 4242`, date future, CVC quelconque. La commande
+passe en `PAID` (stock décrémenté, panier vidé) via le webhook.
+
 ## Scripts
 
 | Commande           | Effet                              |
@@ -83,11 +101,11 @@ pnpm dev:rt     # serveur de jeu  → http://localhost:4000
 - [x] Multilingue FR/EN
 - [x] Schéma BDD + migrations + seed
 - [x] Authentification (comptes, sessions, profil)
-- [x] Boutique + panier + commande (checkout stub, Stripe à brancher)
+- [x] Boutique + panier + commande + paiement Stripe (optionnel)
 - [x] Classement + espace de jeu
 - [x] Intégration temps réel (lobby, parties, tours)
 - [x] Tests (Vitest) + CI (GitHub Actions)
-- [ ] Règles du jeu (à définir) + paiement Stripe
+- [ ] Règles détaillées du jeu (le moteur et la page sont prêts)
 
 Le moteur de jeu est volontairement générique (tour par tour) en attendant les
 règles. Pour tester le multijoueur sans le site, le service temps réel accepte

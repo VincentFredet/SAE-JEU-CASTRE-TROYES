@@ -114,6 +114,11 @@
     "endBody": "The game ends once the end condition is met. The player with the most points wins.",
     "ctaPlay": "Play a match"
   },
+  "checkout": {
+    "successTitle": "Thank you for your order!",
+    "successBody": "Your payment was received.",
+    "continue": "Continue shopping"
+  },
   "auth": {
     "loginTitle": "Sign in",
     "registerTitle": "Create an account",
