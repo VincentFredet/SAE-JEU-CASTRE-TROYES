@@ -6,7 +6,14 @@ import { prisma } from "@jeux/db";
 import { signIn, signOut } from "@/lib/auth";
 import { registerSchema } from "@/lib/validators";
 
-type AuthErrorKey = "invalidCredentials" | "emailTaken" | "usernameTaken" | "invalidInput";
+type AuthErrorKey =
+  | "invalidCredentials"
+  | "emailTaken"
+  | "usernameTaken"
+  | "invalidInput"
+  | "invalidEmail"
+  | "invalidUsername"
+  | "invalidPassword";
 export type AuthFormState = { error: AuthErrorKey } | null;
 
 export async function loginAction(
@@ -35,7 +42,13 @@ export async function registerAction(
     username: formData.get("username"),
     password: formData.get("password"),
   });
-  if (!parsed.success) return { error: "invalidInput" };
+  if (!parsed.success) {
+    const field = parsed.error.issues[0]?.path[0];
+    if (field === "email") return { error: "invalidEmail" };
+    if (field === "username") return { error: "invalidUsername" };
+    if (field === "password") return { error: "invalidPassword" };
+    return { error: "invalidInput" };
+  }
   const { email, username, password } = parsed.data;
 
   const existing = await prisma.user.findFirst({

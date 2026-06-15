@@ -9,9 +9,10 @@ export const registerSchema = z.object({
   email: z.string().email(),
   username: z
     .string()
+    .trim()
     .min(3)
     .max(20)
-    .regex(/^[a-zA-Z0-9_]+$/, "Lettres, chiffres et _ uniquement"),
+    .regex(/^[\p{L}\p{N}._-]+$/u, "Lettres, chiffres, . _ - (sans espace)"),
   password: z.string().min(8).max(72),
 });
 

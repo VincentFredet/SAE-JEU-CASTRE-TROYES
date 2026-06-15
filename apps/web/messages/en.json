@@ -143,7 +143,12 @@
     "invalidCredentials": "Wrong email or password.",
     "emailTaken": "This email is already in use.",
     "usernameTaken": "This username is already taken.",
-    "invalidInput": "Invalid fields."
+    "invalidInput": "Invalid fields.",
+    "invalidEmail": "Invalid email.",
+    "invalidUsername": "Username: 3 to 20 characters, no spaces.",
+    "invalidPassword": "Password: at least 8 characters.",
+    "usernameHint": "3 to 20 characters, no spaces.",
+    "passwordHint": "At least 8 characters."
   },
   "admin": {
     "title": "Administration",

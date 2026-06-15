@@ -20,6 +20,7 @@ export function RegisterForm() {
       <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
         {t("username")}
         <input name="username" minLength={3} maxLength={20} required className={field} />
+        <span className="text-xs font-normal text-ink-soft">{t("usernameHint")}</span>
       </label>
       <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
         {t("email")}
@@ -35,6 +36,7 @@ export function RegisterForm() {
           required
           className={field}
         />
+        <span className="text-xs font-normal text-ink-soft">{t("passwordHint")}</span>
       </label>
       <button type="submit" disabled={pending} className={`${buttonPrimary} mt-1 w-full py-3`}>
         {t("submitRegister")}
