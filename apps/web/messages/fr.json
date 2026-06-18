@@ -85,7 +85,10 @@
     "viewOnMap": "Voir sur la carte",
     "stockAvailable": "{n} en stock",
     "stockOut": "Indisponible",
-    "details": "Voir la boutique"
+    "details": "Voir la boutique",
+    "backToStores": "Retour aux points de vente",
+    "orderTitle": "Commander le jeu",
+    "orderIntro": "Commandez RELIQUES en ligne, livré chez vous."
   },
   "clickCollect": {
     "title": "Click & Collect",

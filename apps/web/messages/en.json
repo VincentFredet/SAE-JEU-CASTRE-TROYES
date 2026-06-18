@@ -85,7 +85,10 @@
     "viewOnMap": "View on map",
     "stockAvailable": "{n} in stock",
     "stockOut": "Out of stock",
-    "details": "View shop"
+    "details": "View shop",
+    "backToStores": "Back to stores",
+    "orderTitle": "Order the game",
+    "orderIntro": "Order RELIQUES online, delivered to your door."
   },
   "clickCollect": {
     "title": "Click & Collect",

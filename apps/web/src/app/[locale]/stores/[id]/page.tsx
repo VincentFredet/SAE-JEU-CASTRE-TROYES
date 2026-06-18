@@ -5,11 +5,10 @@ import { auth } from "@/lib/auth";
 import { initLocale } from "@/lib/locale";
 import { getShop, getProducts } from "@/lib/reliques-api";
 import { formatEuro } from "@/lib/money";
-import { buttonGhost } from "@/lib/ui";
+import { buttonPrimary, buttonGhost } from "@/lib/ui";
 import { Reveal } from "@/components/Reveal";
 import { StoresMap } from "@/components/stores/StoresMap";
 import type { MapMarker } from "@/components/stores/StoresMapInner";
-import { ClickCollectForm } from "@/components/stores/ClickCollectForm";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -19,7 +18,7 @@ export default async function StoreDetailPage({ params }: Props) {
   const { id } = await params;
   const locale = await initLocale(params);
   const t = await getTranslations("stores");
-  const tc = await getTranslations("clickCollect");
+  const ts = await getTranslations("shop");
   const session = await auth();
 
   const [shop, products] = await Promise.all([getShop(id, locale), getProducts(locale)]);
@@ -56,7 +55,7 @@ export default async function StoreDetailPage({ params }: Props) {
       />
       <div className="relative mx-auto max-w-5xl px-6 py-16">
         <Link href="/stores" className="text-sm font-medium text-ink-soft transition hover:text-clay">
-          ← {tc("backToStores")}
+          ← {t("backToStores")}
         </Link>
 
         <Reveal>
@@ -100,29 +99,29 @@ export default async function StoreDetailPage({ params }: Props) {
           <Reveal dir="up" delay={80}>
             <div className="rounded-3xl border border-line bg-white/70 p-7 shadow-[0_30px_60px_-50px_rgba(33,26,19,0.5)]">
               <h2 className="font-display text-2xl font-semibold leading-tight text-ink">
-                {tc("title")}
+                {t("orderTitle")}
               </h2>
               {product && (
                 <p className="mt-2 text-sm text-ink-soft">
                   {product.title ?? `#${product.id}`} - {formatEuro(product.price, locale)}
                 </p>
               )}
-              <p className="mt-1 text-sm text-ink-soft">{tc("intro")}</p>
+              <p className="mt-1 text-sm text-ink-soft">{t("orderIntro")}</p>
 
               <div className="mt-6">
-                {!product || !inStock ? (
-                  <p className="text-ink-soft">{t("stockOut")}</p>
+                {!product || (product.stock ?? 0) <= 0 ? (
+                  <p className="text-ink-soft">{ts("outOfStock")}</p>
                 ) : !session?.user ? (
                   <Link href="/login" className={`${buttonGhost} w-full justify-center`}>
-                    {tc("loginToReserve")}
+                    {ts("loginToBuy")}
                   </Link>
                 ) : (
-                  <ClickCollectForm
-                    shopId={shop.id}
-                    productId={product.id}
-                    email={session.user.email ?? ""}
-                    maxQuantity={stock}
-                  />
+                  <Link
+                    href={`/checkout?product=${product.id}`}
+                    className={`${buttonPrimary} w-full justify-center`}
+                  >
+                    {ts("order")}
+                  </Link>
                 )}
               </div>
             </div>
