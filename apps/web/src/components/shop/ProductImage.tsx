@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   src: string | null;
@@ -29,6 +29,14 @@ function pick(seed: string) {
 // real image only once it has loaded so a missing file never breaks the layout.
 export function ProductImage({ src, alt, seed }: Props) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Si l'image est déjà en cache au montage, onLoad ne se déclenche pas : on
+  // vérifie nous-mêmes complete/naturalWidth pour la révéler quand même.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
+  }, [src]);
 
   const initials = alt
     .split(/\s+/)
@@ -54,11 +62,12 @@ export function ProductImage({ src, alt, seed }: Props) {
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={imgRef}
           src={src}
           alt={alt}
           loading="lazy"
           onLoad={() => setLoaded(true)}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+          className={`absolute inset-0 h-full w-full object-contain p-3 transition-opacity duration-500 ${
             loaded ? "opacity-100" : "opacity-0"
           }`}
         />

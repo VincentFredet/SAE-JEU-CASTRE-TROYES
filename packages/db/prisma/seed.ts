@@ -8,7 +8,7 @@ const PRODUCTS = [
     slug: "jeu-base",
     priceCents: 3990,
     stock: 50,
-    imageUrl: "/products/jeu-base.svg",
+    imageUrl: "/products/jeu-base.png",
     translations: {
       fr: {
         name: "RELIQUES - Boite de base",
@@ -24,7 +24,7 @@ const PRODUCTS = [
     slug: "extension-1",
     priceCents: 1990,
     stock: 30,
-    imageUrl: "/products/extension-1.svg",
+    imageUrl: "/products/extension-1.png",
     translations: {
       fr: {
         name: "RELIQUES - Le Temple Perdu",
@@ -40,7 +40,7 @@ const PRODUCTS = [
     slug: "goodies-pack",
     priceCents: 990,
     stock: 100,
-    imageUrl: "/products/goodies.svg",
+    imageUrl: "/products/goodies.png",
     translations: {
       fr: {
         name: "RELIQUES - Pack collector",

@@ -4,6 +4,8 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma, type Role } from "@jeux/db";
 import { loginSchema } from "./validators";
+import { login as apiLogin } from "./reliques-api";
+import { mirrorApiUser } from "./user-mirror";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -16,13 +18,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       authorize: async (raw) => {
         const parsed = loginSchema.safeParse(raw);
         if (!parsed.success) return null;
+        const { email, password } = parsed.data;
 
-        const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+        // 1. Auth via l'API partenaire (source de vérité des comptes joueurs).
+        let apiOk = false;
+        try {
+          await apiLogin(email, password);
+          apiOk = true;
+        } catch {
+          apiOk = false;
+        }
+        if (apiOk) {
+          const u = await mirrorApiUser({ email });
+          return { id: u.id, email: u.email, name: u.name, username: u.username, role: u.role };
+        }
+
+        // 2. Repli local : comptes admin/seed absents de l'API.
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user?.passwordHash) return null;
-
-        const ok = await bcrypt.compare(parsed.data.password, user.passwordHash);
-        if (!ok) return null;
-
+        if (!(await bcrypt.compare(password, user.passwordHash))) return null;
         return {
           id: user.id,
           email: user.email,

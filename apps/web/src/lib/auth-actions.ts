@@ -1,10 +1,10 @@
 "use server";
 
 import { AuthError } from "next-auth";
-import bcrypt from "bcryptjs";
-import { prisma } from "@jeux/db";
 import { signIn, signOut } from "@/lib/auth";
 import { registerSchema } from "@/lib/validators";
+import { register as apiRegister, RegisterConflictError } from "@/lib/reliques-api";
+import { mirrorApiUser } from "@/lib/user-mirror";
 
 type AuthErrorKey =
   | "invalidCredentials"
@@ -13,7 +13,8 @@ type AuthErrorKey =
   | "invalidInput"
   | "invalidEmail"
   | "invalidUsername"
-  | "invalidPassword";
+  | "invalidPassword"
+  | "serverError";
 export type AuthFormState = { error: AuthErrorKey } | null;
 
 export async function loginAction(
@@ -51,22 +52,21 @@ export async function registerAction(
   }
   const { email, username, password } = parsed.data;
 
-  const existing = await prisma.user.findFirst({
-    where: { OR: [{ email }, { username }] },
-    select: { email: true },
-  });
-  if (existing) return { error: existing.email === email ? "emailTaken" : "usernameTaken" };
-
-  const passwordHash = await bcrypt.hash(password, 10);
+  // Création du compte côté API partenaire (source de vérité).
   try {
-    await prisma.user.create({ data: { email, username, passwordHash, cart: { create: {} } } });
+    await apiRegister(email, username, password);
   } catch (e) {
-    const err = e as { code?: string; meta?: { target?: string[] } };
-    if (err.code === "P2002") {
-      return { error: err.meta?.target?.includes("username") ? "usernameTaken" : "emailTaken" };
+    if (e instanceof RegisterConflictError) {
+      if (e.field === "username") return { error: "usernameTaken" };
+      if (e.field === "email") return { error: "emailTaken" };
+      return { error: "invalidInput" };
     }
-    throw e;
+    console.error("[register] API register failed:", e);
+    return { error: "serverError" };
   }
+
+  // Miroir local (avec le username choisi) avant la connexion, pour les scores/leaderboard.
+  await mirrorApiUser({ email, username });
 
   try {
     await signIn("credentials", { email, password, redirectTo: "/" });

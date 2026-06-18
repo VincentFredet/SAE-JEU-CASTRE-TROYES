@@ -55,12 +55,16 @@ describe("registerSchema", () => {
     expect(registerSchema.safeParse({ ...valid, username: "a".repeat(21) }).success).toBe(false);
   });
 
-  it("rejects usernames with forbidden characters", () => {
+  it("rejects usernames with spaces or symbols", () => {
     expect(registerSchema.safeParse({ ...valid, username: "has space" }).success).toBe(false);
-    expect(registerSchema.safeParse({ ...valid, username: "has-dash" }).success).toBe(false);
-    expect(registerSchema.safeParse({ ...valid, username: "accentue" + "é" }).success).toBe(
-      false,
-    );
+    expect(registerSchema.safeParse({ ...valid, username: "has/slash" }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...valid, username: "at@sign" }).success).toBe(false);
+  });
+
+  it("accepts accents, dots, underscores and hyphens", () => {
+    expect(registerSchema.safeParse({ ...valid, username: "has-dash" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...valid, username: "accentué" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...valid, username: "dot.name_1" }).success).toBe(true);
   });
 
   it("rejects a password shorter than 8 characters", () => {
