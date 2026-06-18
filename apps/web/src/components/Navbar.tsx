@@ -11,6 +11,8 @@ export async function Navbar() {
 
   const links = [
     { href: "/shop", label: t("shop") },
+    { href: "/stores", label: t("stores") },
+    { href: "/news", label: t("news") },
     { href: "/leaderboard", label: t("leaderboard") },
     { href: "/rules", label: t("rules") },
     { href: "/play", label: t("play") },
@@ -21,22 +23,13 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/70 bg-cream/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="group flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink font-display text-base font-semibold text-cream transition group-hover:bg-clay">
-            R
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-lg font-semibold tracking-tight text-ink">
-              {tc("appName")}
-            </span>
-            <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-soft">
-              {tc("studio")}
-            </span>
-          </span>
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 font-ui sm:px-6">
+        <Link href="/" className="group flex items-center" aria-label={tc("appName")}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/reliques/logo.png" alt={tc("appName")} className="h-10 w-auto transition group-hover:opacity-90" />
         </Link>
 
-        <ul className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex">
+        <ul className="hidden items-center gap-6 text-[15px] font-normal text-ink-mute lg:flex">
           {links.map((l) => (
             <li key={l.href}>
               <Link
@@ -50,13 +43,6 @@ export async function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href="/cart"
-            className="hidden text-sm font-medium text-ink-soft transition hover:text-ink sm:block"
-          >
-            {t("cart")}
-          </Link>
-
           {session?.user ? (
             <div className="flex items-center gap-2">
               <Link

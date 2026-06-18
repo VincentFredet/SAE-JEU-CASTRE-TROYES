@@ -10,14 +10,14 @@ test.describe("locale switcher", () => {
   test("switching to English updates the URL and the content", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: "Affrontez vos amis, en ligne." }),
+      page.getByRole("heading", { name: "Deux cultes cachés. Tout le monde ment." }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "en" }).click();
 
     await expect(page).toHaveURL(/\/en$/);
     await expect(
-      page.getByRole("heading", { name: "Challenge your friends, online." }),
+      page.getByRole("heading", { name: "Two hidden cults. Everyone lies." }),
     ).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });

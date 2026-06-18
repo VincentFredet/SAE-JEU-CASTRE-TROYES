@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Anton, Inter, Roboto_Flex } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
@@ -9,12 +9,8 @@ import { Footer } from "@/components/Footer";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-  axes: ["opsz"],
-});
+const roboto = Roboto_Flex({ subsets: ["latin"], variable: "--font-roboto", display: "swap" });
+const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton", display: "swap" });
 
 type Props = {
   children: React.ReactNode;
@@ -37,8 +33,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${fraunces.variable} h-full`}>
-      <body className="flex min-h-full flex-col">
+    <html lang={locale} className={`${inter.variable} ${roboto.variable} ${anton.variable} h-full overflow-x-clip`}>
+      <body className="flex min-h-full flex-col overflow-x-clip">
         <NextIntlClientProvider messages={messages}>
           <Navbar />
           <main className="flex-1">{children}</main>

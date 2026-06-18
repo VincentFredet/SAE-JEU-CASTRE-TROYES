@@ -7,7 +7,7 @@ import { Tilt } from "@/components/Tilt";
 
 type Props = { params: Promise<{ locale: string }> };
 
-type Row = { userId: string; username: string; points: number };
+type Row = { userId: string; username: string; played: number; wins: number };
 
 const PODIUM = [
   {
@@ -39,24 +39,29 @@ export default async function LeaderboardPage({ params }: Props) {
   const session = await auth();
   const currentUserId = session?.user?.id;
 
-  const totals = await prisma.score.groupBy({
-    by: ["userId"],
-    _sum: { points: true },
-    orderBy: { _sum: { points: "desc" } },
-    take: 50,
-  });
+  // Parties jouées = nb de lignes de score ; victoires = lignes gagnantes (points > 0).
+  const [gamesAgg, winsAgg] = await Promise.all([
+    prisma.score.groupBy({ by: ["userId"], _count: { _all: true } }),
+    prisma.score.groupBy({ by: ["userId"], where: { points: { gt: 0 } }, _count: { _all: true } }),
+  ]);
+  const winsById = new Map(winsAgg.map((w) => [w.userId, w._count._all]));
 
-  const userIds = totals.map((row) => row.userId);
+  const ranked = gamesAgg
+    .map((g) => ({ userId: g.userId, played: g._count._all, wins: winsById.get(g.userId) ?? 0 }))
+    .sort((a, b) => b.wins - a.wins || b.played - a.played)
+    .slice(0, 50);
+
   const users = await prisma.user.findMany({
-    where: { id: { in: userIds } },
+    where: { id: { in: ranked.map((r) => r.userId) } },
     select: { id: true, username: true },
   });
   const usernameById = new Map(users.map((u) => [u.id, u.username]));
 
-  const rows: Row[] = totals.map((row) => ({
-    userId: row.userId,
-    username: usernameById.get(row.userId) ?? "",
-    points: row._sum.points ?? 0,
+  const rows: Row[] = ranked.map((r) => ({
+    userId: r.userId,
+    username: usernameById.get(r.userId) ?? "",
+    played: r.played,
+    wins: r.wins,
   }));
 
   const podium = rows.slice(0, 3);
@@ -134,10 +139,13 @@ export default async function LeaderboardPage({ params }: Props) {
                           ) : null}
                         </h2>
                         <p className="mt-5 font-display text-5xl font-semibold leading-none text-gradient tabular-nums">
-                          {row.points}
+                          {row.wins}
                         </p>
                         <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-ink-soft">
-                          {t("points")}
+                          {t("wins")}
+                        </p>
+                        <p className="mt-1 text-xs text-ink-soft/70">
+                          {t("gamesPlayed", { n: row.played })}
                         </p>
                       </article>
                     </Tilt>
@@ -154,7 +162,7 @@ export default async function LeaderboardPage({ params }: Props) {
                     <span>{t("rank")}</span>
                     <div className="flex gap-10">
                       <span>{t("player")}</span>
-                      <span>{t("points")}</span>
+                      <span>{t("wins")}</span>
                     </div>
                   </div>
                 </Reveal>
@@ -183,9 +191,14 @@ export default async function LeaderboardPage({ params }: Props) {
                               ) : null}
                             </span>
                           </div>
-                          <span className="font-display text-2xl font-semibold tabular-nums text-ink">
-                            {row.points}
-                          </span>
+                          <div className="text-right">
+                            <span className="block font-display text-2xl font-semibold tabular-nums text-ink">
+                              {row.wins}
+                            </span>
+                            <span className="block text-xs text-ink-soft/70">
+                              {t("gamesPlayed", { n: row.played })}
+                            </span>
+                          </div>
                         </li>
                       </Reveal>
                     );

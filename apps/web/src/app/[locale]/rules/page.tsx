@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { LOCATION_IDS } from "@jeux/shared/reliques";
 import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/lib/locale";
 import { buttonPrimary } from "@/lib/ui";
@@ -7,59 +8,20 @@ import { Tilt } from "@/components/Tilt";
 import { BoardMap } from "@/components/game/BoardMap";
 
 type Props = { params: Promise<{ locale: string }> };
-
-type ActionRow = { name: string; public: string; trace: string };
-type Mission = { name: string; steps: string };
-type Npc = { name: string; text: string };
-type Sabotage = { name: string; text: string };
-type Locations = {
-  temple: string;
-  tombeau: string;
-  sanctuaire: string;
-  crypte: string;
-  galerie: string;
-  camp: string;
-  bazar: string;
-  atelier: string;
-  jungle: string;
-  marais: string;
-  docks: string;
-  falaise: string;
-  pont: string;
-  faille: string;
-};
-type Zones = {
-  ruins: string;
-  camp: string;
-  lands: string;
-};
-
-const MISSION_TONES = [
-  "bg-clay/10 text-clay",
-  "bg-pine/10 text-pine",
-  "bg-amber/15 text-clay-deep",
-  "bg-ink/10 text-ink",
-] as const;
-
-const SABOTAGE_TONES = [
-  "bg-clay/10 text-clay",
-  "bg-pine/10 text-pine",
-  "bg-amber/15 text-clay-deep",
-  "bg-ink/10 text-ink",
-] as const;
+type Lever = { name: string; text: string };
 
 export default async function RulesPage({ params }: Props) {
   await initLocale(params);
   const t = await getTranslations("rules");
+  const rt = await getTranslations("reliques");
 
-  const tableItems = t.raw("tableItems") as string[];
-  const appItems = t.raw("appItems") as string[];
-  const actions = t.raw("actions") as ActionRow[];
-  const missions = t.raw("missions") as Mission[];
-  const npcs = t.raw("npcs") as Npc[];
-  const sabotages = t.raw("sabotages") as Sabotage[];
-  const locations = t.raw("locations") as Locations;
-  const zones = t.raw("zones") as Zones;
+  const turnOptions = t.raw("turnOptions") as string[];
+  const npcLevers = t.raw("npcLevers") as Lever[];
+  const exDedClues = t.raw("exDedClues") as string[];
+  const exDedClues2 = t.raw("exDedClues2") as string[];
+  const recapSteps = t.raw("recapSteps") as string[];
+  const locations = Object.fromEntries(LOCATION_IDS.map((id) => [id, rt(`locations.${id}`)]));
+  const locationsShort = Object.fromEntries(LOCATION_IDS.map((id) => [id, rt(`locationsShort.${id}`)]));
 
   return (
     <section className="relative overflow-hidden">
@@ -69,13 +31,8 @@ export default async function RulesPage({ params }: Props) {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-[40rem] h-96 w-96 rounded-full bg-pine/15 blur-3xl animate-float"
+        className="pointer-events-none absolute -left-40 top-[44rem] h-96 w-96 rounded-full bg-pine/15 blur-3xl animate-float"
         style={{ animationDelay: "2s" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-32 top-[90rem] h-96 w-96 rounded-full bg-clay/15 blur-3xl animate-float-slow"
-        style={{ animationDelay: "1s" }}
       />
 
       <div className="relative mx-auto max-w-5xl px-6 py-20">
@@ -103,370 +60,228 @@ export default async function RulesPage({ params }: Props) {
           </Reveal>
         </header>
 
-        {/* Pitch */}
-        <Reveal dir="left" className="mt-20">
-          <article className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-12">
-            <span className="grid h-20 w-20 shrink-0 place-items-center rounded-[1.5rem] bg-clay/10 font-display text-3xl font-semibold text-clay">
-              01
+        {/* L'histoire */}
+        <div className="mt-16 grid items-center gap-10 lg:grid-cols-2">
+          <Reveal dir="left">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">
+              {t("storyTag")}
             </span>
-            <div className="max-w-2xl">
-              <h2 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">
-                {t("pitchTitle")}
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t("pitchBody")}</p>
-            </div>
-          </article>
-        </Reveal>
-
-        {/* Coeur hybride : deux panneaux */}
-        <div className="mt-24">
-          <Reveal>
-            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("hybridTitle")}
+            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+              {t("storyTitle")}
             </h2>
+            <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t("storyBody1")}</p>
+            <p className="mt-3 text-lg leading-relaxed text-ink-soft">{t("storyBody2")}</p>
           </Reveal>
-          <Reveal delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              {t("hybridIntro")}
-            </p>
-          </Reveal>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            <Reveal dir="left" delay={60}>
-              <Tilt className="h-full">
-                <div className="grain flex h-full flex-col rounded-[2rem] border border-line bg-white/70 p-8">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-pine">
-                    {t("tableLabel")}
-                  </span>
-                  <ul className="mt-6 space-y-4">
-                    {tableItems.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-pine" />
-                        <span className="leading-relaxed text-ink">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Tilt>
-            </Reveal>
-
-            <Reveal dir="right" delay={140}>
-              <Tilt className="h-full">
-                <div className="grain flex h-full flex-col rounded-[2rem] bg-ink p-8 text-cream shadow-[0_30px_60px_-35px_rgba(33,26,19,0.6)]">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
-                    {t("appLabel")}
-                  </span>
-                  <ul className="mt-6 space-y-4">
-                    {appItems.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber" />
-                        <span className="leading-relaxed text-cream/85">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Tilt>
-            </Reveal>
-          </div>
-        </div>
-
-        {/* La carte */}
-        <div className="mt-24">
-          <Reveal>
-            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("mapTitle")}
-            </h2>
-          </Reveal>
-          <Reveal delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{t("mapIntro")}</p>
-          </Reveal>
-
-          <Reveal dir="scale" delay={120}>
-            <Tilt max={4}>
-              <div className="grain relative mt-10 overflow-hidden rounded-[2rem] border border-line bg-parchment p-6 shadow-[0_40px_80px_-45px_rgba(33,26,19,0.45)] sm:p-10">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber/25 blur-2xl animate-float"
-                />
-                <div className="relative mx-auto max-w-2xl">
-                  <BoardMap
-                    locations={locations}
-                    zones={zones}
-                    hubLabel={t("mapHub")}
-                    extractLabel={t("mapExtract")}
-                  />
-                </div>
+          <Reveal dir="right" delay={120}>
+            <Tilt max={5}>
+              <div className="grain overflow-hidden rounded-[2rem] border border-line bg-cream p-3 shadow-[0_40px_80px_-45px_rgba(33,26,19,0.5)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/img/hero.png" alt="" aria-hidden className="aspect-[3/2] w-full rounded-[1.4rem] object-cover" />
               </div>
             </Tilt>
           </Reveal>
-
-          <Reveal dir="up" delay={80}>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">{t("mapNote")}</p>
-          </Reveal>
         </div>
 
-        {/* Les 5 actions */}
-        <div className="mt-24">
+        {/* Le but */}
+        <Reveal dir="up" className="mt-16">
+          <div className="rounded-[2rem] border border-amber/40 bg-amber/10 p-8 sm:p-10">
+            <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">{t("goalTitle")}</h2>
+            <p className="mt-3 max-w-2xl text-lg leading-relaxed text-clay-deep">{t("goalBody")}</p>
+          </div>
+        </Reveal>
+
+        {/* Un tour de jeu */}
+        <div className="mt-16">
           <Reveal>
             <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("actionsTitle")}
+              {t("turnTitle")}
             </h2>
           </Reveal>
           <Reveal delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              {t("actionsIntro")}
-            </p>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{t("turnIntro")}</p>
           </Reveal>
-
-          <div className="mt-12 space-y-4">
-            <Reveal dir="up">
-              <div className="hidden grid-cols-[2.5rem_1fr_1.1fr_1fr] gap-4 px-6 text-xs font-semibold uppercase tracking-[0.16em] text-ink-soft sm:grid">
-                <span />
-                <span>{t("colAction")}</span>
-                <span>{t("colPublic")}</span>
-                <span>{t("colTrace")}</span>
-              </div>
-            </Reveal>
-            {actions.map((a, i) => (
-              <Reveal key={a.name} dir="left" delay={i * 60}>
-                <Tilt max={4}>
-                  <article className="grain grid grid-cols-1 gap-3 rounded-[1.5rem] border border-line bg-white/70 p-6 transition hover:border-clay/40 hover:shadow-[0_20px_50px_-30px_rgba(162,74,31,0.4)] sm:grid-cols-[2.5rem_1fr_1.1fr_1fr] sm:items-center sm:gap-4">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-clay/10 font-display text-lg font-semibold text-clay">
-                      {i + 1}
-                    </span>
-                    <h3 className="font-display text-xl font-semibold text-ink">{a.name}</h3>
-                    <p className="leading-relaxed text-ink-soft">
-                      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft/70 sm:hidden">
-                        {t("colPublic")}:{" "}
-                      </span>
-                      {a.public}
-                    </p>
-                    <p className="leading-relaxed text-ink-soft">
-                      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft/70 sm:hidden">
-                        {t("colTrace")}:{" "}
-                      </span>
-                      {a.trace}
-                    </p>
-                  </article>
-                </Tilt>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {turnOptions.map((opt, i) => (
+              <Reveal key={opt} dir="up" delay={i * 100}>
+                <div className="flex items-center gap-4 rounded-2xl border border-line bg-white/70 p-6">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-clay/10 font-display text-lg font-semibold text-clay">
+                    {i + 1}
+                  </span>
+                  <span className="font-medium leading-relaxed text-ink">{opt}</span>
+                </div>
               </Reveal>
             ))}
           </div>
+        </div>
 
-          <Reveal dir="right" delay={80}>
-            <div className="mt-8 flex items-start gap-4 rounded-2xl border border-amber/40 bg-amber/10 px-5 py-4">
-              <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber font-display text-sm font-semibold text-ink">
-                !
-              </span>
-              <p className="text-sm font-medium leading-relaxed text-clay-deep">
-                {t("constraintsNote")}
-              </p>
+        {/* Parler à un PNJ */}
+        <div className="mt-20 grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <Reveal dir="left">
+            <Tilt max={5}>
+              <div className="grain overflow-hidden rounded-[2rem] border border-line bg-cream p-3 shadow-[0_40px_80px_-45px_rgba(33,26,19,0.5)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/img/rules-npc.png" alt="" aria-hidden className="aspect-square w-full rounded-[1.4rem] object-cover" />
+              </div>
+            </Tilt>
+          </Reveal>
+          <Reveal dir="right" delay={100}>
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              {t("npcTitle")}
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t("npcIntro")}</p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-pine/30 bg-pine/5 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pine">
+                  {t("npcPublicLabel")}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{t("npcPublicText")}</p>
+              </div>
+              <div className="rounded-2xl border border-line bg-ink p-5 text-cream">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber">
+                  {t("npcPrivateLabel")}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-cream/80">{t("npcPrivateText")}</p>
+              </div>
+            </div>
+
+            <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-ink-soft">
+              {t("npcPayIntro")}
+            </p>
+            <div className="mt-3 space-y-3">
+              {npcLevers.map((lever) => (
+                <div key={lever.name} className="rounded-2xl border border-line bg-white/70 p-5">
+                  <h3 className="font-display text-lg font-semibold text-ink">{lever.name}</h3>
+                  <p className="mt-1 leading-relaxed text-ink-soft">{lever.text}</p>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
 
-        {/* Les missions */}
-        <div className="mt-24">
+        {/* Concret : deux exemples travaillés */}
+        <div className="mt-20">
           <Reveal>
-            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("missionsTitle")}
-            </h2>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">{t("exTag")}</span>
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{t("exTitle")}</h2>
           </Reveal>
-          <Reveal delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              {t("missionsBody")}
-            </p>
-          </Reveal>
-
-          <Reveal dir="left" delay={120}>
-            <p className="mt-12 font-display text-2xl font-semibold text-ink">
-              {t("missionsExamplesTitle")}
-            </p>
-          </Reveal>
-
-          <div className="mt-8 grid gap-6 sm:grid-cols-2">
-            {missions.map((m, i) => (
-              <Reveal key={m.name} dir={i % 2 === 0 ? "left" : "right"} delay={(i % 2) * 80}>
-                <Tilt className="h-full">
-                  <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-white/70 p-8 transition hover:border-clay/40 hover:shadow-[0_25px_55px_-30px_rgba(162,74,31,0.4)]">
-                    <span
-                      className={`grid h-12 w-12 place-items-center rounded-2xl font-display text-lg font-semibold ${MISSION_TONES[i % MISSION_TONES.length]}`}
-                    >
-                      {i + 1}
-                    </span>
-                    <h3 className="mt-6 font-display text-2xl font-semibold text-ink">{m.name}</h3>
-                    <p className="mt-3 leading-relaxed text-ink-soft">{m.steps}</p>
-                  </article>
-                </Tilt>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-
-        {/* Les personnages */}
-        <div className="mt-24">
-          <Reveal>
-            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("npcsTitle")}
-            </h2>
-          </Reveal>
-          <Reveal delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{t("npcsIntro")}</p>
-          </Reveal>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {/* Le Gardien mis en avant */}
-            <Reveal dir="left" className="lg:row-span-2">
-              <Tilt className="h-full">
-                <article className="grain relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] bg-ink p-9 text-cream shadow-[0_30px_60px_-35px_rgba(33,26,19,0.6)]">
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-clay/40 blur-3xl animate-float"
-                  />
-                  <span className="relative grid h-12 w-12 place-items-center rounded-2xl bg-clay font-display text-lg font-semibold">
-                    1
-                  </span>
-                  <div className="relative mt-16">
-                    <h3 className="font-display text-3xl font-semibold leading-tight">
-                      {npcs[0]?.name}
-                    </h3>
-                    <p className="mt-3 leading-relaxed text-cream/75">{npcs[0]?.text}</p>
-                  </div>
-                </article>
-              </Tilt>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:items-start">
+            <Reveal dir="up">
+              <article className="rounded-[2rem] border border-line bg-white/70 p-7">
+                <h3 className="font-display text-2xl font-semibold text-ink">{t("exDedTitle")}</h3>
+                <p className="mt-2 leading-relaxed text-ink-soft">{t("exDedIntro")}</p>
+                <ul className="mt-4 space-y-1.5">
+                  {exDedClues.map((c, i) => (
+                    <li key={i} className="rounded-lg border-l-[3px] border-pine/50 bg-pine/5 px-3 py-1.5 text-sm font-medium text-ink">{c}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 font-semibold text-clay-deep">{t("exDedMid")}</p>
+                <ul className="mt-3 space-y-1.5">
+                  {exDedClues2.map((c, i) => (
+                    <li key={i} className="rounded-lg border-l-[3px] border-pine/50 bg-pine/5 px-3 py-1.5 text-sm font-medium text-ink">{c}</li>
+                  ))}
+                </ul>
+                <p className="mt-4 rounded-xl bg-amber/10 px-4 py-3 font-semibold text-clay-deep">{t("exDedDone")}</p>
+              </article>
             </Reveal>
-
-            {npcs.slice(1).map((npc, i) => (
-              <Reveal
-                key={npc.name}
-                dir="up"
-                delay={i * 90}
-                className="lg:col-span-2"
-              >
-                <Tilt>
-                  <article className="grain flex items-start gap-6 rounded-[2rem] border border-line bg-white/70 p-8 transition hover:border-clay/40 hover:shadow-[0_20px_50px_-25px_rgba(162,74,31,0.4)]">
-                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber/15 font-display text-xl font-semibold text-clay-deep">
-                      {i + 2}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-2xl font-semibold text-ink">{npc.name}</h3>
-                      <p className="mt-2 leading-relaxed text-ink-soft">{npc.text}</p>
-                    </div>
-                  </article>
-                </Tilt>
-              </Reveal>
-            ))}
+            <Reveal dir="up" delay={100}>
+              <article className="rounded-[2rem] border border-line bg-white/70 p-7">
+                <h3 className="font-display text-2xl font-semibold text-ink">{t("exLieTitle")}</h3>
+                <p className="mt-2 leading-relaxed text-ink-soft">{t("exLieIntro")}</p>
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-lg border-l-[3px] border-amber/60 bg-amber/10 px-3 py-1.5 text-sm font-medium text-ink">{t("exLiePlayer")}</div>
+                  <p className="text-sm leading-relaxed text-ink-soft">{t("exLieTrap")}</p>
+                  <div className="rounded-lg border-l-[3px] border-pine/50 bg-pine/5 px-3 py-1.5 text-sm font-medium text-ink">{t("exLieAncien")}</div>
+                  <div className="rounded-lg border-l-[3px] border-clay/60 bg-clay/10 px-3 py-1.5 text-sm font-medium text-ink-soft line-through">{t("exLiePlayer")}</div>
+                  <p className="text-sm font-semibold text-clay-deep">{t("exLieCaught")}</p>
+                </div>
+                <p className="mt-4 rounded-xl bg-pine/10 px-4 py-3 text-sm font-semibold text-pine">{t("exLieMoral")}</p>
+              </article>
+            </Reveal>
           </div>
         </div>
 
-        {/* Saboter par la carte */}
-        <div className="mt-24">
-          <Reveal dir="right">
-            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              {t("sabotageTitle")}
-            </h2>
-          </Reveal>
-          <Reveal dir="right" delay={80}>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              {t("sabotageIntro")}
-            </p>
-          </Reveal>
-
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            {sabotages.map((s, i) => (
-              <Reveal key={s.name} dir={i % 2 === 0 ? "right" : "left"} delay={(i % 2) * 80}>
-                <Tilt className="h-full">
-                  <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-parchment/60 p-8 transition hover:border-clay/40 hover:shadow-[0_25px_55px_-30px_rgba(162,74,31,0.4)]">
-                    <span
-                      className={`grid h-12 w-12 place-items-center rounded-2xl font-display text-lg font-semibold ${SABOTAGE_TONES[i % SABOTAGE_TONES.length]}`}
-                    >
-                      {i + 1}
-                    </span>
-                    <h3 className="mt-6 font-display text-2xl font-semibold text-ink">{s.name}</h3>
-                    <p className="mt-3 leading-relaxed text-ink-soft">{s.text}</p>
-                  </article>
-                </Tilt>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-
-        {/* Tour de jeu + extraction finale */}
-        <div className="mt-24 grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        {/* Démêler + Gagner */}
+        <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:items-stretch">
           <Reveal dir="left">
             <Tilt className="h-full">
               <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-white/70 p-9">
-                <span className="font-display text-6xl font-semibold leading-none text-gradient">
-                  {"->"}
-                </span>
-                <h2 className="mt-6 font-display text-3xl font-semibold leading-tight text-ink">
-                  {t("turnTitle")}
+                <h2 className="font-display text-3xl font-semibold leading-tight text-ink">
+                  {t("deduceTitle")}
                 </h2>
-                <p className="mt-3 leading-relaxed text-ink-soft">{t("turnBody")}</p>
-              </article>
-            </Tilt>
-          </Reveal>
-
-          <Reveal dir="right" delay={100}>
-            <Tilt className="h-full">
-              <article className="grain relative flex h-full flex-col overflow-hidden rounded-[2rem] bg-ink p-9 text-cream shadow-[0_30px_60px_-35px_rgba(33,26,19,0.65)]">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-clay/40 blur-3xl animate-float"
-                />
-                <span className="relative font-display text-6xl font-semibold leading-none text-amber">
-                  *
-                </span>
-                <h2 className="relative mt-6 font-display text-3xl font-semibold leading-tight">
-                  {t("climaxTitle")}
-                </h2>
-                <p className="relative mt-3 leading-relaxed text-cream/75">{t("climaxBody")}</p>
-              </article>
-            </Tilt>
-          </Reveal>
-        </div>
-
-        {/* Se renseigner + accuser */}
-        <div className="mt-20 grid gap-6 sm:grid-cols-2">
-          <Reveal dir="left">
-            <Tilt className="h-full">
-              <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-parchment/60 p-8">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-pine">
-                  {t("infoTitle")}
-                </span>
-                <p className="mt-4 leading-relaxed text-ink-soft">{t("infoBody")}</p>
+                <p className="mt-3 leading-relaxed text-ink-soft">{t("deduceBody")}</p>
               </article>
             </Tilt>
           </Reveal>
           <Reveal dir="right" delay={100}>
             <Tilt className="h-full">
-              <article className="grain flex h-full flex-col rounded-[2rem] border border-line bg-parchment/60 p-8">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">
-                  {t("accuseTitle")}
-                </span>
-                <p className="mt-4 leading-relaxed text-ink-soft">{t("accuseBody")}</p>
+              <article className="grain flex h-full flex-col rounded-[2rem] bg-ink p-9 text-cream shadow-[0_30px_60px_-35px_rgba(33,26,19,0.6)]">
+                <span className="font-display text-6xl font-semibold leading-none text-amber">*</span>
+                <h2 className="mt-6 font-display text-3xl font-semibold leading-tight">{t("winTitle")}</h2>
+                <p className="mt-3 leading-relaxed text-cream/80">{t("winBody")}</p>
               </article>
             </Tilt>
           </Reveal>
         </div>
 
-        {/* Fin de partie */}
-        <Reveal dir="up" className="mt-20">
-          <article className="flex flex-col gap-6 sm:ml-16 sm:flex-row sm:items-start sm:gap-12 sm:text-right">
-            <div className="order-2 max-w-2xl sm:order-1">
-              <h2 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">
-                {t("endTitle")}
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t("endBody")}</p>
-            </div>
-            <span className="order-1 grid h-20 w-20 shrink-0 place-items-center rounded-[1.5rem] bg-pine/10 font-display text-3xl font-semibold text-pine sm:order-2">
-              {String(actions.length + 1).padStart(2, "0")}
+        {/* En résumé */}
+        <div className="mt-20">
+          <Reveal>
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              {t("recapTitle")}
+            </h2>
+          </Reveal>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {recapSteps.map((step, i) => (
+              <Reveal key={i} dir="up" delay={(i % 2) * 90}>
+                <div className="flex items-start gap-4 rounded-2xl border border-line bg-white/70 p-6">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-clay font-display text-base font-semibold text-cream">
+                    {i + 1}
+                  </span>
+                  <span className="leading-relaxed text-ink">{step}</span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* L'app */}
+        <Reveal dir="up" className="mt-12">
+          <div className="flex items-start gap-4 rounded-2xl border border-line bg-parchment/60 px-6 py-5">
+            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber/15 font-display text-base font-semibold text-clay-deep">
+              ?
             </span>
-          </article>
+            <div>
+              <h3 className="font-display text-xl font-semibold text-ink">{t("appTitle")}</h3>
+              <p className="mt-1 leading-relaxed text-ink-soft">{t("appBody")}</p>
+            </div>
+          </div>
         </Reveal>
 
+        {/* La carte (en bas) + overlay non contractuel */}
+        <div className="mt-20">
+          <Reveal>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              {t("mapTitle")}
+            </h2>
+          </Reveal>
+          <Reveal delay={60}>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{t("mapBody")}</p>
+          </Reveal>
+          <Reveal dir="scale" delay={80}>
+            <div className="relative mt-6 overflow-hidden rounded-[2rem] border border-line bg-parchment p-3 shadow-[0_40px_80px_-45px_rgba(33,26,19,0.5)] sm:p-4">
+              <BoardMap locations={locations} short={locationsShort} />
+              <div className="pointer-events-none absolute inset-x-0 bottom-5 grid place-items-center">
+                <span className="-rotate-3 rounded-xl border border-cream/40 bg-ink/70 px-5 py-2 text-xs font-bold uppercase tracking-[0.25em] text-cream backdrop-blur-sm">
+                  {t("mapDisclaimer")}
+                </span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
         {/* CTA */}
-        <Reveal dir="scale" className="mt-24">
+        <Reveal dir="scale" className="mt-20">
           <div className="grain relative overflow-hidden rounded-[2.5rem] bg-ink px-8 py-20 text-center sm:px-16">
             <div
               aria-hidden

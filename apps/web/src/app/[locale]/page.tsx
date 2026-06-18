@@ -6,14 +6,9 @@ import { Tilt } from "@/components/Tilt";
 import { Marquee } from "@/components/Marquee";
 import { buttonPrimary, buttonGhost } from "@/lib/ui";
 
-const BOARD = [
-  0, 1, 0, 2, 0, 3, 0, 0, 1, 0, 0, 2, 3, 0, 1, 0, 0, 2, 0, 0, 1, 0, 3, 0, 2,
-];
-const PIECE = ["", "bg-clay", "bg-pine", "bg-amber"];
-
 function BoardArt() {
   return (
-    <div className="relative mx-auto w-full max-w-sm">
+    <div className="relative mx-auto w-full max-w-md">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-8 -top-8 h-16 w-16 rounded-2xl bg-amber/80 shadow-lg animate-float"
@@ -23,17 +18,14 @@ function BoardArt() {
         className="pointer-events-none absolute -bottom-6 -left-6 h-12 w-12 rounded-full bg-pine shadow-lg animate-float"
         style={{ animationDelay: "1.2s" }}
       />
-      <div className="grain rounded-[2rem] border border-line bg-parchment p-5 shadow-[0_40px_80px_-40px_rgba(33,26,19,0.45)]">
-        <div className="grid grid-cols-5 gap-2.5">
-          {BOARD.map((p, i) => (
-            <div
-              key={i}
-              className="grid aspect-square place-items-center rounded-xl bg-cream/80 ring-1 ring-line"
-            >
-              {p > 0 && <span className={`h-2/3 w-2/3 rounded-full ${PIECE[p]} shadow-inner`} />}
-            </div>
-          ))}
-        </div>
+      <div className="grain overflow-hidden rounded-[2rem] border border-line bg-parchment p-3 shadow-[0_40px_80px_-40px_rgba(33,26,19,0.5)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/img/rumeur/cover-velonde.png"
+          alt=""
+          aria-hidden
+          className="aspect-[3/2] w-full rounded-[1.4rem] object-cover"
+        />
       </div>
     </div>
   );
@@ -52,6 +44,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     { n: "01", title: t("step1Title"), text: t("step1Text") },
     { n: "02", title: t("step2Title"), text: t("step2Text") },
     { n: "03", title: t("step3Title"), text: t("step3Text") },
+  ];
+  const gallery = [
+    { img: "/products/jeu-base.png", title: t("galleryBoxTitle"), text: t("galleryBoxText") },
+    {
+      img: "/products/goodies.png",
+      title: t("galleryComponentsTitle"),
+      text: t("galleryComponentsText"),
+    },
+    {
+      img: "/products/extension-1.png",
+      title: t("galleryExtensionTitle"),
+      text: t("galleryExtensionText"),
+    },
   ];
 
   return (
@@ -155,6 +160,83 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Reveal>
           ))}
         </div>
+      </section>
+
+      {/* Découvre le jeu - le plateau */}
+      <section className="border-y border-line bg-parchment/40">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 lg:grid-cols-2">
+          <Reveal dir="left">
+            <span className="inline-flex items-center rounded-full border border-line bg-white/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">
+              {t("discoverTag")}
+            </span>
+            <h2 className="mt-6 font-display text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl">
+              {t("discoverTitle")}
+            </h2>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+              {t("discoverText")}
+            </p>
+            <Link href="/rules" className={`${buttonGhost} mt-8 px-6 py-3 text-base`}>
+              {t("ctaRules")}
+            </Link>
+          </Reveal>
+
+          <Reveal dir="right" delay={120}>
+            <Tilt max={5}>
+              <figure className="grain overflow-hidden rounded-[2rem] border border-line bg-cream p-3 shadow-[0_40px_80px_-45px_rgba(33,26,19,0.5)]">
+                <div className="overflow-hidden rounded-[1.4rem]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/img/rumeur/map-velonde.png" alt={t("discoverBoardCaption")} className="aspect-[3/2] w-full object-cover" />
+                </div>
+                <figcaption className="px-2 py-3 text-center text-sm text-ink-soft">
+                  {t("discoverBoardCaption")}
+                </figcaption>
+              </figure>
+            </Tilt>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Galerie - dans la boîte */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <Reveal>
+          <span className="inline-flex items-center rounded-full border border-line bg-white/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">
+            {t("galleryTag")}
+          </span>
+          <h2 className="mt-6 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+            {t("galleryTitle")}
+          </h2>
+        </Reveal>
+        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {gallery.map((g, i) => (
+            <Reveal key={g.img} dir="up" delay={i * 110}>
+              <Tilt>
+                <article className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-line bg-white/70 transition hover:border-clay/40 hover:shadow-[0_28px_60px_-32px_rgba(162,74,31,0.4)]">
+                  <div className="bg-gradient-to-br from-parchment to-cream p-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={g.img}
+                      alt={g.title}
+                      className="aspect-square w-full rounded-[1.4rem] object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-display text-xl font-semibold leading-snug text-ink">
+                      {g.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">{g.text}</p>
+                  </div>
+                </article>
+              </Tilt>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={80}>
+          <div className="mt-12 flex flex-wrap gap-4">
+            <Link href="/shop" className={`${buttonPrimary} px-7 py-3 text-base`}>
+              {t("ctaShop")}
+            </Link>
+          </div>
+        </Reveal>
       </section>
 
       {/* Étapes décalées */}
