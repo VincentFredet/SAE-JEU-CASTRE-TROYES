@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./game": "./src/game/index.ts",
+    "./reliques": "./src/reliques/index.ts",
     "./server": "./src/server/index.ts"
   },
   "scripts": {

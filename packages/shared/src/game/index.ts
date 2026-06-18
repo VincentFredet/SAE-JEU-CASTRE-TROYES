@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Note, Team, LieEntry } from "../reliques/index";
 
 export type MatchId = string;
 export type UserId = string;
@@ -18,6 +19,8 @@ export interface GamePlayer {
   connected: boolean;
 }
 
+// État commun d'un salon/partie (sans secrets). Le détail du jeu (camps, indices,
+// vraies ruines) ne transite jamais par là : il part dans la vue privée de chacun.
 export interface MatchState {
   id: MatchId;
   name: string;
@@ -27,8 +30,6 @@ export interface MatchState {
   currentTurnSeat: number | null;
   turn: number;
   winnerSeat: number | null;
-  // État spécifique aux règles, à définir quand elles existeront.
-  board: unknown;
   updatedAt: number;
 }
 
@@ -40,12 +41,6 @@ export interface MatchSummary {
   maxPlayers: number;
 }
 
-export const gameActionSchema = z.object({
-  type: z.string().min(1).max(64),
-  payload: z.unknown().optional(),
-});
-export type GameAction = z.infer<typeof gameActionSchema>;
-
 export const createMatchSchema = z.object({
   name: z.string().min(1).max(60),
   maxPlayers: z.number().int().min(2).max(8).default(2),
@@ -54,21 +49,49 @@ export type CreateMatchPayload = z.infer<typeof createMatchSchema>;
 
 export type Ack<T> = { ok: true; data: T } | { ok: false; error: string };
 
+// Vue PRIVÉE d'un joueur (sans secrets : ni les camps des autres, ni les vraies
+// ruines tant que la partie n'est pas finie). Une par joueur.
+export interface ReliquesPlayerView {
+  seat: number;
+  tile: string;
+  name: string;
+  connected: boolean;
+}
+export interface ReliquesView {
+  matchId: MatchId;
+  you: number;
+  team: Team;
+  tile: string;
+  notes: Note[];
+  players: ReliquesPlayerView[];
+  turn: number;
+  current: number;
+  phase: "play" | "claim" | "over";
+  claimBy: number | null;
+  youSubmitted: boolean;
+  pendingTrade: { from: number; to: number } | null;
+  teamBlocked: boolean;
+  // Dernière réclamation ratée : résultat public (qui), raison (divisé/personne) seulement pour son camp.
+  lastClaim: { by: number; someRight: boolean | null; turn: number } | null;
+  winner: Team | null;
+  reveal: { soleil: string; lune: string } | null;
+  lies: LieEntry[] | null; // dévoilé en fin de partie : qui a menti à qui, et quoi
+}
+
 export interface ClientToServerEvents {
-  "match:list": (cb: (res: Ack<MatchSummary[]>) => void) => void;
-  "match:create": (payload: CreateMatchPayload, cb: (res: Ack<MatchState>) => void) => void;
-  "match:join": (payload: { matchId: MatchId }, cb: (res: Ack<MatchState>) => void) => void;
-  "match:leave": (payload: { matchId: MatchId }) => void;
-  "match:start": (payload: { matchId: MatchId }, cb: (res: Ack<MatchState>) => void) => void;
-  "match:action": (
-    payload: { matchId: MatchId; action: GameAction },
-    cb: (res: Ack<MatchState>) => void,
-  ) => void;
+  // Salons par code, vues privées par joueur.
+  "reliques:create": (payload: CreateMatchPayload, cb: (res: Ack<MatchState>) => void) => void;
+  "reliques:join": (payload: { matchId: MatchId }, cb: (res: Ack<MatchState>) => void) => void;
+  "reliques:leave": (payload: { matchId: MatchId }) => void;
+  "reliques:start": (payload: { matchId: MatchId }, cb: (res: Ack<MatchState>) => void) => void;
+  "reliques:action": (payload: { matchId: MatchId; action: unknown }, cb: (res: Ack<null>) => void) => void;
 }
 
 export interface ServerToClientEvents {
-  "match:state": (state: MatchState) => void;
-  "match:ended": (payload: { winnerSeat: number | null }) => void;
+  // L'état du salon (commun) + ta vue privée du jeu.
+  "reliques:state": (state: MatchState) => void;
+  "reliques:view": (view: ReliquesView) => void;
+  "reliques:ended": (payload: { winner: Team | null }) => void;
 }
 
 export interface SocketData {

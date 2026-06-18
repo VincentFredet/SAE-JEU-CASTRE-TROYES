@@ -2,17 +2,15 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import {
   createMatchSchema,
-  gameActionSchema,
   MATCH_STATUS,
   type Ack,
   type ClientToServerEvents,
-  type MatchState,
   type ServerToClientEvents,
   type SocketData,
 } from "@jeux/shared";
 import { verifySocketToken } from "@jeux/shared/server";
 import { prisma } from "@jeux/db";
-import { MatchManager } from "./matchManager.js";
+import { ReliquesManager } from "./reliquesManager.js";
 
 type InterServerEvents = Record<string, never>;
 
@@ -42,7 +40,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
   { cors: { origin: CORS_ORIGIN, methods: ["GET", "POST"] } },
 );
 
-const manager = new MatchManager();
+const reliques = new ReliquesManager();
 const persisted = new Set<string>();
 
 const fail = (e: unknown): Ack<never> => ({
@@ -50,25 +48,37 @@ const fail = (e: unknown): Ack<never> => ({
   error: e instanceof Error ? e.message : "Erreur inconnue",
 });
 
-async function persistResult(state: MatchState) {
-  if (state.winnerSeat === null || persisted.has(state.id)) return;
-  const winner = state.players.find((p) => p.seat === state.winnerSeat);
-  if (!winner) return;
-  persisted.add(state.id);
+// Fin de partie : on enregistre une ligne par participant (parties jouées), les
+// gagnants reçoivent WINNER_POINTS, les autres 0. meta.won permet de compter les victoires.
+async function persistResult(id: string) {
+  if (persisted.has(id)) return;
+  // Les invités (userId "guest:…") n'ont pas de compte : pas de score persisté
+  // (ils casseraient la FK Score.userId -> User). Les vrais joueurs d'une même
+  // partie restent enregistrés normalement.
+  const players = reliques.participantUserIds(id).filter((uid) => !uid.startsWith("guest:"));
+  if (players.length === 0) return;
+  persisted.add(id);
+  const winners = new Set(reliques.winningUserIds(id));
   try {
-    await prisma.score.create({
-      data: { userId: winner.userId, game: "default", points: WINNER_POINTS, meta: { matchId: state.id } },
+    await prisma.score.createMany({
+      data: players.map((userId) => {
+        const won = winners.has(userId);
+        return { userId, game: "reliques", points: won ? WINNER_POINTS : 0, meta: { matchId: id, won } };
+      }),
     });
   } catch (e) {
     console.error("persist score failed:", e instanceof Error ? e.message : e);
   }
 }
 
-function broadcast(state: MatchState) {
-  io.to(state.id).emit("match:state", state);
+function broadcast(id: string) {
+  const state = reliques.get(id);
+  if (!state) return;
+  io.to(id).emit("reliques:state", state);
+  for (const { userId, view } of reliques.views(id)) io.to(`u:${userId}`).emit("reliques:view", view);
   if (state.status === MATCH_STATUS.Finished) {
-    io.to(state.id).emit("match:ended", { winnerSeat: state.winnerSeat });
-    void persistResult(state);
+    io.to(id).emit("reliques:ended", { winner: reliques.winner(id) });
+    void persistResult(id);
   }
 }
 
@@ -96,69 +106,68 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
   const { userId, username } = socket.data;
+  void socket.join(`u:${userId}`); // salon perso, pour les vues privées
 
-  for (const state of manager.setConnected(userId, true)) {
+  for (const state of reliques.setConnected(userId, true)) {
     void socket.join(state.id);
-    broadcast(state);
+    broadcast(state.id);
   }
 
-  socket.on("match:list", (cb) => cb({ ok: true, data: manager.list() }));
-
-  socket.on("match:create", (payload, cb) => {
+  socket.on("reliques:create", (payload, cb) => {
     const parsed = createMatchSchema.safeParse(payload);
     if (!parsed.success) return cb({ ok: false, error: "Données invalides" });
-    const state = manager.create({ userId, username }, parsed.data);
+    const state = reliques.create({ userId, username }, parsed.data);
     void socket.join(state.id);
     cb({ ok: true, data: state });
   });
 
-  socket.on("match:join", ({ matchId }, cb) => {
+  socket.on("reliques:join", ({ matchId }, cb) => {
     try {
-      const state = manager.join(matchId, { userId, username });
+      const state = reliques.join(matchId, { userId, username });
       void socket.join(matchId);
-      broadcast(state);
+      broadcast(matchId);
       cb({ ok: true, data: state });
     } catch (e) {
       cb(fail(e));
     }
   });
 
-  socket.on("match:leave", ({ matchId }) => {
-    const { state } = manager.leave(matchId, userId);
+  socket.on("reliques:leave", ({ matchId }) => {
+    const state = reliques.leave(matchId, userId);
     void socket.leave(matchId);
-    if (state) broadcast(state);
+    if (state) broadcast(matchId);
   });
 
-  socket.on("match:start", ({ matchId }, cb) => {
+  socket.on("reliques:start", ({ matchId }, cb) => {
     try {
-      const state = manager.start(matchId, userId);
-      broadcast(state);
+      const state = reliques.start(matchId, userId);
+      broadcast(matchId);
       cb({ ok: true, data: state });
     } catch (e) {
       cb(fail(e));
     }
   });
 
-  socket.on("match:action", ({ matchId, action }, cb) => {
-    const parsed = gameActionSchema.safeParse(action);
-    if (!parsed.success) return cb({ ok: false, error: "Action invalide" });
+  socket.on("reliques:action", ({ matchId, action }, cb) => {
     try {
-      const state = manager.applyAction(matchId, userId, parsed.data);
-      broadcast(state);
-      cb({ ok: true, data: state });
+      reliques.submit(matchId, userId, action);
+      broadcast(matchId);
+      cb({ ok: true, data: null });
     } catch (e) {
       cb(fail(e));
     }
   });
 
   socket.on("disconnect", () => {
-    for (const state of manager.setConnected(userId, false)) {
-      broadcast(state);
+    for (const state of reliques.setConnected(userId, false)) {
+      broadcast(state.id);
     }
   });
 });
 
-setInterval(() => manager.sweep(30 * 60 * 1000), 5 * 60 * 1000).unref();
+setInterval(() => {
+  reliques.sweep(30 * 60 * 1000);
+}, 5 * 60 * 1000).unref();
 
 httpServer.listen(PORT, () => {
   console.log(`realtime: http://localhost:${PORT}`);
